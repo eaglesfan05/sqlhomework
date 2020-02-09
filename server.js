@@ -5,7 +5,7 @@ var inquirer = require("inquirer");
 var connection = mysql.createConnection({
     host: "localhost",
 
-    port: 8080,
+    port: 3306,
 
     user: "root",
     password: "root",
@@ -18,7 +18,7 @@ connection.connect(function (err) {
     // if(err){
     //     console.log(err);
     // }else{
-        // if (err) throw err;    
+        if (err) throw err;    
     console.log("connected as id " + connection.threadId);
     
 
@@ -40,6 +40,7 @@ function start() {
                 "Add a role?",
                 "Add a department?",
                 "Update an employees Role?",
+                "View all employees.",
                 "Delete an employee?"
             ]
         }
@@ -73,8 +74,12 @@ function start() {
                 case "Delete an Employee?":
                     deleteEmployee();
 
-                default:
+                case "View all employees.":
                     afterConnection();
+                    break;
+
+                default: 
+                    connection.end();
                     break;
 
             }
@@ -116,6 +121,7 @@ function addEmployee() {
                 role_id: answer.role_id,
                 manager_id: answer.manager_id
             }, function (err) {
+                if (err) throw err;
                 console.log("Employee successfully added!")
 
             }
@@ -138,33 +144,56 @@ function addRole(){
        {
            type: "input",
            name: "salary",
-           message: "Please enter a salary for this job title."
+           message: "Please enter a salary for this job title. $"
        },
        {
            type: "input",
            name: "jobid",
            message: "Please enter an ID for this job."
        }
-    ])
-   
-   .then(function(answer){
-       connection.query("INSERT INTO role SET ?", {
+    ]).then(function(answer){
+        //add role to table
+       connection.query("INSERT INTO job SET ?", {
            title: answer.role,
            salary: answer.salary,
            department_id: answer.jobid
        }, function(err){
+           if (err) throw err;
            console.log("Role successfully added!")
+           
        })
-   })
-   
-   .then(function(){
+       
+   }).then(function(){
     start();
    })
-   
+  
 };
 
+
+//add a department//
 function addDepartment(){
-    start();
+    //prompt for department info//
+    inquirer.prompt({
+        type: "input",
+        name: "department",
+        message: "Please enter a department name."
+    })
+
+    .then(function(answer){
+        //set department in database//
+        connection.query("INSERT INTO department SET ? ", 
+        {
+            name: answer.department
+        }, function(err){
+            if(err)throw err;
+            console.log("department successfully added!")
+        })
+    })
+
+    .then(function(){
+        start();
+    })
+    
 };
 // updateRole(){
 // //     start();
@@ -179,7 +208,12 @@ function addDepartment(){
 
 function afterConnection() {
     connection.query("SELECT * FROM employee", function (err, res) {
-        // if(err) throw err;
+        if(err) throw err;
+        let employeeArray= [];
+        for(let i = 0; i <res.length; i++){
+            employeeArray.push(res[i].first_name.last_name)
+        }
+
         console.log(res);
         connection.end();
     });
