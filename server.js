@@ -18,8 +18,9 @@ connection.connect(function (err) {
     // if(err){
     //     console.log(err);
     // }else{
+        // if (err) throw err;    
     console.log("connected as id " + connection.threadId);
-    // // if (err) throw err;
+    
 
     // // console.log("connected as id " + connection.threadId);
     // afterConnection();
@@ -44,39 +45,40 @@ function start() {
         }
 
     ).then(function (answer) {
-            if(answer.choice === "Add an employee?"){
-                addEmployee();
-            }else if(answer.choice === "Delete an employee?"){
-                deleteEmployee();
-            }else{
-                connection.end();
+            // if(answer.choice === "Add an employee?"){
+            //     addEmployee();
+            // }else if(answer.choice === "Delete an employee?"){
+            //     deleteEmployee();
+            // }else{
+            // //     connection.end();
+            // }
+
+            switch (answer.choice) {
+               case "Add an employee?":
+                    addEmployee();
+                    break; 
+
+                case "Add a role?":
+                    addRole();
+                    break;
+
+                case "Add a department?":
+                    addDepartment();
+                    break;
+
+                case "Update an employee's role?":
+                    updateRole();
+                    break;
+
+                case "Delete an Employee?":
+                    deleteEmployee();
+
+                default:
+                    afterConnection();
+                    break;
+
             }
-            // switch (answer.choice) {
-            //    case "Add an employee?":
-            //         addEmployee();
-            //         break; 
-
-                // case "Add a role?":
-                //     addRole();
-                //     break;
-
-                // case "Add a department?":
-                //     addDepartment();
-                //     break;
-
-                // case "Update an employee's role?":
-                //     updateRole();
-                //     break;
-
-                // case "Delete an Employee?":
-                //     deleteEmployee();
-
-                // // default:
-                //     afterConnection();
-                //     break;
-
-            }
-        );
+    });
     
 }
 //add new employee//
@@ -121,17 +123,49 @@ function addEmployee() {
     }).then(function(){
         start();
     })
-// afterConnection();
-    // start();
 };
 
+//add a role//
+function addRole(){
 
-// addRole(){
-//     start();
-// };
-// addDepartment(){
-//     start();
-// };
+    //prompt for role details//
+   inquirer.prompt([
+       {
+           type: "input",
+           name: "role",
+           message: "Please enter a job title."
+       },
+       {
+           type: "input",
+           name: "salary",
+           message: "Please enter a salary for this job title."
+       },
+       {
+           type: "input",
+           name: "jobid",
+           message: "Please enter an ID for this job."
+       }
+    ])
+   
+   .then(function(answer){
+       connection.query("INSERT INTO role SET ?", {
+           title: answer.role,
+           salary: answer.salary,
+           department_id: answer.jobid
+       }, function(err){
+           console.log("Role successfully added!")
+       })
+   })
+   
+   .then(function(){
+    start();
+   })
+   
+};
+
+function addDepartment(){
+    start();
+};
 // updateRole(){
 // //     start();
 // // };
