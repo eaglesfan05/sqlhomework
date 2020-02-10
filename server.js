@@ -39,7 +39,7 @@ function start() {
                 "Add an employee?",
                 "Add a role?",
                 "Add a department?",
-                "Update an employees Role?",
+                "Update an employee's role?",
                 "View all employees.",
                 "Delete an employee?"
             ]
@@ -101,9 +101,9 @@ function addEmployee() {
             message: "What is the employees last name?"
         },
         {
-            type: "input",
+            type: "list",
             name: "role_id",
-            message: "What is the role ID?"
+            message: "What is this employee's role?"
         },
         {
             type: "input",
@@ -137,9 +137,15 @@ function addRole(){
     //prompt for role details//
    inquirer.prompt([
        {
-           type: "input",
+           type: "list",
            name: "role",
-           message: "Please enter a job title."
+           message: "Please enter a job title.",
+           choices: [
+               "Sales",
+               "Marketing",
+               "Manager",
+               "Engineer"
+           ]
        },
        {
            type: "input",
@@ -195,9 +201,24 @@ function addDepartment(){
     })
     
 };
-// updateRole(){
-// //     start();
-// // };
+
+
+function updateRole(){
+    var query = connection.query("UPDATE job SET ? WHERE ?", [
+        {
+            department_id: 6
+        },
+        {
+            title: "sales"
+        }
+    ], function(err, res){
+        if (err) throw err;
+        console.log(res.affectedRows + "Role updated");
+
+        start();
+    })
+   console.log(query.sql);
+};
 
 // deleteEmployee(){
 //     start();
@@ -211,11 +232,14 @@ function afterConnection() {
         if(err) throw err;
         let employeeArray= [];
         for(let i = 0; i <res.length; i++){
-            employeeArray.push(res[i].first_name.last_name)
+            employeeArray.push(res[i])
         }
-
-        console.log(res);
-        connection.end();
+        if(!res.length){
+            console.log("no employees");
+        }else{
+            console.log(res);
+        }
+        start();
     });
 }
 
