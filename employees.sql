@@ -11,10 +11,10 @@ CREATE TABLE department (
 );
 
 CREATE TABLE job (
-    id INTEGER(11) AUTO_INCREMENT,
+    role_id INTEGER(11) AUTO_INCREMENT,
     title VARCHAR(100),
     salary INTEGER(30),
-    department_id INTEGER(11),
+    department_id VARCHAR(100),
     PRIMARY KEY(id)
 );
 
@@ -22,7 +22,7 @@ CREATE TABLE employee (
     id INTEGER(11) AUTO_INCREMENT,
     first_name VARCHAR(30),
     last_name VARCHAR(30),
-    role_id VARCHAR(30),
+    title VARCHAR(30),
     manager_id VARCHAR(30),
     PRIMARY KEY(id)
 );
